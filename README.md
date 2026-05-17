@@ -200,12 +200,12 @@ This project is licensed under the MIT License - see the `LICENSE` file for deta
 For questions or issues, please open a GitHub issue or contact:
 - Nilavra Pathak: npathak@expediagroup.com
 
- 
+## Acknowledgments
+
+This work was partially supported by the National Science Foundation (NSF) through CAREER Grant \#1750936, CNS EAGER Grant \#2233879, IIS Grant \#2509680, and I-Corps Grant \#2502886; by the U.S. Army under Grants \#W911NF2120076 and \#W911NF2410367; and by the Office of Naval Research (ONR) under Grant \#N00014-23-1-2119.
 
  
-## 🙏 Acknowledgments
-
-`This work has been partially supported by NSF CAREER Grant \#1750936, NSF CNS EAGER Grant \#2233879, NSF IIS Grant \#2509680, NSF I-Corps Grant \#2502886, U.S. Army Grants \#W911NF2120076 & \#W911NF2410367, and ONR Grant \#N00014-23-1-2119.`
+ 
 ---
 
 **Workload Data**: Alibaba 2018 cluster trace available at [https://github.com/alibaba/clusterdata](https://github.com/alibaba/clusterdata)
