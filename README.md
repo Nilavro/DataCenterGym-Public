@@ -11,7 +11,7 @@ Gymnasium-compatible environment for multi-objective datacenter scheduling with 
 
 Nilavra Pathak (Expedia Group), Samadrita Biswas (Curia Global), Nirmalya Roy (UMBC)
 
-Accepted at IEEE SMARTCOMP 2025
+Accepted at IEEE SMARTCOMP 2026
 
 ## 🎯 Key Features
 
