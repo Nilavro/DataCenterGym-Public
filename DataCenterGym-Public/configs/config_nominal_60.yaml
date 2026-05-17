@@ -1,0 +1,130 @@
+# DataCenterGym Configuration - Nominal Regime (60% Utilization)
+# Purpose: Show all policies achieve similar QoS when constraints are slack
+
+# System dimensions
+num_clusters: 5
+num_datacenters: 2
+episode_length: 288  # 24 hours at 5-minute intervals
+time_step_minutes: 5
+max_jobs_per_step: 180  # Reduced from 300 to achieve ~60% utilization
+
+# Cluster configurations (heterogeneous)
+clusters:
+  - id: 0
+    type: cpu
+    alpha: 0.8      # Heat generation coefficient (W per compute unit)
+    phi: 0.2        # Power consumption coefficient (W per compute unit)
+    c_max: 200      # Max compute capacity
+
+  - id: 1
+    type: cpu
+    alpha: 0.8
+    phi: 0.2
+    c_max: 200      # Max compute capacity
+
+  - id: 2
+    type: gpu
+    alpha: 3.0      # GPUs run hotter (higher heat generation)
+    phi: 1.0        # GPUs use more power
+    c_max: 1000     # High capacity to handle GPU-heavy workload
+
+  - id: 3
+    type: gpu
+    alpha: 3.0
+    phi: 1.0
+    c_max: 1000
+
+  - id: 4
+    type: gpu
+    alpha: 3.0
+    phi: 1.0
+    c_max: 1000
+
+# Cluster to datacenter mapping
+# Clusters 0-1 are in Datacenter 0
+# Clusters 2-4 are in Datacenter 1
+cluster_to_dc: [0, 0, 1, 1, 1]
+
+# Datacenter parameters
+datacenters:
+  - id: 0
+    name: "Northern DC (Cool Climate)"
+    location: "Seattle"
+    R: 0.01         # Thermal resistance (°C/W) - lower = better heat dissipation
+    C: 500000.0     # Thermal capacitance (J/°C) - datacenter building thermal mass
+    theta_max: 35   # Max safe temperature (°C) - production datacenter limit
+    theta_init: 20  # Initial temperature (°C) - cooler start
+    cooling_max: 30000  # Maximum cooling power (W)
+    T_target: 22    # Target internal temperature (°C) - thermostat setpoint
+    controller_type: "proportional"  # "proportional" or "pid"
+    controller_params:
+      K_p: 1500.0   # Proportional gain (W/°C) - reduced for smoother control
+      K_i: 10.0     # Integral gain (W/(°C·s)) - reduced to prevent overcooling
+      K_d: 300.0    # Derivative gain (W·s/°C) - reduced for stability
+    # Climate parameters
+    climate:
+      base_temp: 15.0      # Cool climate: 15°C average
+      amplitude: 8.0       # Larger daily variation
+      offset_hours: 0      # Peak temperature at noon
+
+  - id: 1
+    name: "Southern DC (Hot Climate)"
+    location: "Phoenix"
+    R: 0.01
+    C: 500000.0
+    theta_max: 35   # Max safe temperature (°C) - production datacenter limit
+    theta_init: 30  # Initial temperature (°C) - hotter start (adjusted to be below max)
+    cooling_max: 30000
+    T_target: 22
+    controller_type: "proportional"  # "proportional" or "pid"
+    controller_params:
+      K_p: 1500.0   # Proportional gain (W/°C) - reduced for smoother control
+      K_i: 10.0     # Integral gain (W/(°C·s)) - reduced to prevent overcooling
+      K_d: 300.0    # Derivative gain (W·s/°C) - reduced for stability
+    # Climate parameters
+    climate:
+      base_temp: 35.0      # Hot climate: 35°C average
+      amplitude: 10.0      # Large daily variation (desert)
+      offset_hours: 2      # Peak temperature at 2pm (delayed)
+
+# Reward function weights
+lambda_weights:
+  theta: 1.0      # Thermal violation penalty
+  q: 0.5          # Queue length penalty
+  energy: 0.1     # Energy consumption penalty
+  cooling: 0.1    # Cooling effort penalty
+
+# Job affinity constraints
+# If true, CPU jobs can only go to CPU clusters, GPU jobs to GPU clusters
+enforce_affinity: true
+
+# Electricity pricing configuration
+pricing:
+  enabled: true
+  model: "time_of_use"  # Options: "time_of_use", "sinusoid"
+  per_datacenter: true  # If true, each datacenter can have different prices
+
+  # Global pricing parameters (used when per_datacenter=false)
+  peak_price: 0.15      # $/kWh during peak hours
+  offpeak_price: 0.08   # $/kWh during off-peak hours
+  peak_start_hour: 8    # Peak period starts at 8am
+  peak_end_hour: 20     # Peak period ends at 8pm
+
+  # Sinusoid model parameters (alternative)
+  base_price: 0.12      # $/kWh average
+  amplitude: 0.05       # $/kWh price variation
+  period_steps: 288     # 24 hours at 5-minute intervals
+  phase_offset: 4.712   # π/2 * 3 radians (peak at noon)
+
+  # Per-datacenter pricing (used when per_datacenter=true)
+  datacenters:
+    0:  # Seattle - cheaper electricity
+      peak_price: 0.12
+      offpeak_price: 0.06
+      peak_start_hour: 7
+      peak_end_hour: 19
+    1:  # Phoenix - more expensive electricity
+      peak_price: 0.18
+      offpeak_price: 0.10
+      peak_start_hour: 10
+      peak_end_hour: 22

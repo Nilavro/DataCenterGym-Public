@@ -1,0 +1,14 @@
+# DataCenterGym Dependencies
+gymnasium>=0.29.0
+numpy>=1.24.0
+pandas>=2.0.0
+pyyaml>=6.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# MPC Optimization
+cvxpy>=1.4.0
+casadi>=3.6.0
+
+# Optional: For advanced solvers
+# mosek>=10.0
